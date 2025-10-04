@@ -88,7 +88,7 @@ export default function App() {
         {/* 🩷 Header */}
         <div className="mx-auto mb-8">
           <h1
-            className="text-5xl sm:text-6xl font-extrabold tracking-tight 
+            className="text-5xl sm:text-5xl font-extrabold tracking-tight 
                        bg-gradient-to-r from-violet-300 via-indigo-300 to-sky-300
                        bg-clip-text text-transparent 
                        drop-shadow-[0_2px_4px_rgba(0,0,0,0.08)]
