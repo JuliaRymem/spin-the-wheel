@@ -1,7 +1,7 @@
+// src/App.jsx
 import React, { useMemo, useRef, useState } from "react";
 import Wheel from "./components/Wheel.jsx";
-import SegmentList from "./components/SegmentList.jsx";
-import Controls from "./components/Controls.jsx";
+import ManageChoicesModal from "./components/ManageChoicesModal.jsx";
 import { useLocalStorage } from "./hooks/useLocalStorage.js";
 import { pickRandomIndex } from "./utils/random.js";
 
@@ -17,25 +17,30 @@ export default function App() {
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const [winnerIndex, setWinnerIndex] = useState(null);
+  const [manageOpen, setManageOpen] = useState(false);
   const liveRef = useRef(null);
 
-  const segments = useMemo(() => items.map((label, i) => ({
-    label,
-    color: PALETTE[i % PALETTE.length],
-  })), [items]);
+  const segments = useMemo(
+    () =>
+      items.map((label, i) => ({
+        label,
+        color: PALETTE[i % PALETTE.length],
+      })),
+    [items]
+  );
 
   const canSpin = segments.length >= 2 && !spinning;
 
   function onAdd(value) {
     const v = (value || "").trim();
     if (!v) return;
-    if (items.some(s => s.toLowerCase() === v.toLowerCase())) return;
-    setItems(prev => [...prev, v]);
+    if (items.some((s) => s.toLowerCase() === v.toLowerCase())) return;
+    setItems((prev) => [...prev, v]);
   }
 
   function onRemove(idx) {
     if (spinning) return;
-    setItems(prev => prev.filter((_, i) => i !== idx));
+    setItems((prev) => prev.filter((_, i) => i !== idx));
     if (winnerIndex === idx) setWinnerIndex(null);
   }
 
@@ -47,13 +52,12 @@ export default function App() {
     const winner = pickRandomIndex(n);
 
     const segSize = 360 / n;
-    const center = winner * segSize + segSize / 2; // mitt på vinnande segmentet
-    const extraTurns = 5 + Math.floor(Math.random() * 4); // 5..8 varv
-    const target = extraTurns * 360 + (360 - center); // landa vid indikatorn
+    const center = winner * segSize + segSize / 2;
+    const extraTurns = 5 + Math.floor(Math.random() * 4);
+    const target = extraTurns * 360 + (360 - center);
 
-    // reset → target (för att kunna snurra flera gånger)
     requestAnimationFrame(() => {
-      setRotation(prev => prev % 360);
+      setRotation((prev) => prev % 360);
       requestAnimationFrame(() => {
         setRotation(target);
         setWinnerIndex(winner);
@@ -75,59 +79,61 @@ export default function App() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-4 sm:p-6 pt-safe pb-24">
-      <h1 className="text-2xl sm:text-3xl font-extrabold">Spin the Wheel</h1>
-      <p className="text-zinc-600 mt-1">Lägg till egna val och låt ödet (ibland) bestämma ✨</p>
+    <div className="min-h-screen flex flex-col items-center justify-center text-center px-4 py-8 sm:py-12 font-[system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif]">
+      {/* Rubrik */}
+      <h1 className="text-3xl sm:text-4xl font-extrabold">Spin the Wheel</h1>
+      <p className="text-zinc-600 mt-2 mb-4 max-w-sm">
+        Lägg till egna val och låt ödet (ibland) bestämma ✨
+      </p>
 
-      <div className="grid md:grid-cols-2 gap-6 mt-4">
-        <div className="flex flex-col items-center">
-          <Wheel
-            segments={segments}
-            rotation={rotation}
-            spinning={spinning}
-            onTransitionEnd={onTransitionEnd}
-          />
-          <div role="status" aria-live="polite" ref={liveRef} className="h-6 mt-2 text-center font-bold" />
-          <div className="mt-3 text-sm text-zinc-600">{segments.length} val</div>
-        </div>
+      {/* Knapp för att öppna popup */}
+      <button
+        onClick={() => setManageOpen(true)}
+        className="mb-8 px-5 py-3 rounded-2xl bg-zinc-900 text-white font-bold hover:bg-black"
+      >
+        Lägg till val
+      </button>
 
-        <div className="bg-white/70 backdrop-blur border border-zinc-200 rounded-2xl p-4">
-          <Controls
-            canSpin={canSpin}
-            spinning={spinning}
-            onSpin={spin}
-            onReset={resetWheel}
-            onAdd={onAdd}
-          />
-          <SegmentList segments={segments} onRemove={onRemove} />
-        </div>
-      </div>
+      {/* Själva hjulet */}
+      <Wheel
+        segments={segments}
+        rotation={rotation}
+        spinning={spinning}
+        onTransitionEnd={onTransitionEnd}
+      />
 
-      {/* Mobil action bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50
-                      bg-white/90 backdrop-blur border-t border-zinc-200
-                      px-4 pt-3 pb-4 pb-safe">
-        <div className="flex gap-2">
-          <button
-            disabled={!canSpin}
-            onClick={spin}
-            className="flex-1 px-5 py-3 rounded-2xl bg-zinc-900 text-white font-bold disabled:opacity-50"
-          >
-            Snurra
-          </button>
-          <button
-            disabled={spinning}
-            onClick={resetWheel}
-            className="px-4 py-3 rounded-2xl border border-zinc-300 font-bold disabled:opacity-50"
-          >
-            Nollställ
-          </button>
-        </div>
-      </div>
+      {/* Snurra-knapp direkt under hjulet */}
+<div className="mt-6">
+  <button
+    disabled={!canSpin}
+    onClick={spin}
+    className="px-8 py-3 rounded-2xl bg-zinc-900 text-white font-bold text-lg disabled:opacity-50 hover:bg-black transition-colors"
+  >
+    Snurra
+  </button>
+</div>
 
-      <footer className="mt-6 text-sm text-zinc-600">
-        Tips: För tävlingar – avgör vinnare på servern och signera svaret till klienten.
-      </footer>
+      {/* Resultattext */}
+      <div
+        role="status"
+        aria-live="polite"
+        ref={liveRef}
+        className="h-6 mt-4 text-center font-bold"
+      />
+      <div className="mt-1 text-sm text-zinc-600">{segments.length} val</div>
+
+      {/* Popup med valhantering */}
+      <ManageChoicesModal
+        open={manageOpen}
+        onClose={() => setManageOpen(false)}
+        segments={segments}
+        canSpin={canSpin}
+        spinning={spinning}
+        onSpin={spin}
+        onReset={resetWheel}
+        onAdd={onAdd}
+        onRemove={onRemove}
+      />
     </div>
   );
 }
