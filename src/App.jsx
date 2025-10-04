@@ -46,6 +46,7 @@ export default function App() {
     if (winnerIndex === idx) setWinnerIndex(null);
   }
 
+  // fixad spin-funktion (rätt segment under pilen)
   function spin() {
     if (!canSpin) return;
     setSpinning(true);
@@ -56,20 +57,12 @@ export default function App() {
     const winner = pickRandomIndex(n);
     const segSize = 360 / n;
   
-    // Mittpunkten av vinnarsegmentet (geometriskt)
     const center = (winner + 0.5) * segSize;
-  
-    // Vinkel relativt toppen pga "from -90deg" i conic-gradient
     const centerFromTop = -90 + center;
-  
-    // Normalisera till [0, 360)
     const normalized = ((centerFromTop % 360) + 360) % 360;
-  
-    // Rotera så att mittpunkten landar vid indikatorn (toppen)
-    const extraTurns = 5 + Math.floor(Math.random() * 4); // 5..8 varv
+    const extraTurns = 5 + Math.floor(Math.random() * 4);
     const target = extraTurns * 360 + (360 - normalized);
   
-    // Reset → target för att få snygg transition varje gång
     requestAnimationFrame(() => {
       setRotation((prev) => prev % 360);
       requestAnimationFrame(() => {
@@ -92,12 +85,18 @@ export default function App() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center px-5 py-10 text-center bg-gradient-to-b from-rose-50 via-sky-50 to-violet-50">
       <div className="w-full max-w-3xl">
-        {/* Header */}
-        <div className="mx-auto mb-6">
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-zinc-800 drop-shadow-[0_1px_0_rgba(255,255,255,0.8)]">
-            Spin the Wheel
+        {/* 🩷 Header */}
+        <div className="mx-auto mb-8">
+          <h1
+            className="text-5xl sm:text-6xl font-extrabold tracking-tight 
+                       bg-gradient-to-r from-violet-300 via-indigo-300 to-sky-300
+                       bg-clip-text text-transparent 
+                       drop-shadow-[0_2px_4px_rgba(0,0,0,0.08)]
+                       font-['Poppins',sans-serif]"
+          >
+            Spin The Wheel
           </h1>
-          <p className="text-zinc-600 mt-2">
+          <p className="text-zinc-600 mt-4 text-base sm:text-lg font-medium">
             Lägg till egna val och låt ödet (ibland) bestämma ✨
           </p>
 
@@ -111,7 +110,7 @@ export default function App() {
           </button>
         </div>
 
-        {/* Wheel */}
+        {/* 🎡 Wheel */}
         <div className="mx-auto rounded-3xl bg-white/70 backdrop-blur-sm border border-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] p-6">
           <Wheel
             segments={segments}
@@ -120,26 +119,26 @@ export default function App() {
             onTransitionEnd={onTransitionEnd}
           />
 
-          {/* Stor Snurra-knapp */}
-<div className="mt-6">
-  <button
-    disabled={!canSpin}
-    onClick={spin}
-    className="group relative inline-flex items-center justify-center rounded-full
-               h-16 w-32 sm:h-20 sm:w-40
-               bg-gradient-to-r from-pink-200 via-fuchsia-200 to-violet-200
-               text-zinc-900 font-extrabold text-lg sm:text-xl
-               shadow-[0_8px_24px_rgba(244,114,182,0.35)] disabled:opacity-50
-               transition-transform active:scale-95 hover:scale-[1.06]"
-    aria-label="Snurra"
-    title="Snurra"
-  >
-    <span className="absolute inset-0 rounded-full ring-1 ring-white/70" />
-    <span className="drop-shadow-[0_1px_0_rgba(255,255,255,0.8)]">
-      Snurra
-    </span>
-  </button>
-</div>
+          {/* Snurra-knapp */}
+          <div className="mt-6">
+            <button
+              disabled={!canSpin}
+              onClick={spin}
+              className="group relative inline-flex items-center justify-center rounded-full
+                         h-16 w-32 sm:h-20 sm:w-40
+                         bg-gradient-to-r from-pink-200 via-fuchsia-200 to-violet-200
+                         text-zinc-900 font-extrabold text-lg sm:text-xl
+                         shadow-[0_8px_24px_rgba(244,114,182,0.35)] disabled:opacity-50
+                         transition-transform active:scale-95 hover:scale-[1.06]"
+              aria-label="Snurra"
+              title="Snurra"
+            >
+              <span className="absolute inset-0 rounded-full ring-1 ring-white/70" />
+              <span className="drop-shadow-[0_1px_0_rgba(255,255,255,0.8)]">
+                Snurra
+              </span>
+            </button>
+          </div>
 
           {/* Result */}
           <div
