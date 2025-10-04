@@ -46,23 +46,22 @@ export default function App() {
     if (winnerIndex === idx) setWinnerIndex(null);
   }
 
-  // fixad spin-funktion (rätt segment under pilen)
   function spin() {
     if (!canSpin) return;
     setSpinning(true);
     setWinnerIndex(null);
     setWinOpen(false);
-  
+
     const n = segments.length;
     const winner = pickRandomIndex(n);
     const segSize = 360 / n;
-  
+
     const center = (winner + 0.5) * segSize;
     const centerFromTop = -90 + center;
     const normalized = ((centerFromTop % 360) + 360) % 360;
     const extraTurns = 5 + Math.floor(Math.random() * 4);
     const target = extraTurns * 360 + (360 - normalized);
-  
+
     requestAnimationFrame(() => {
       setRotation((prev) => prev % 360);
       requestAnimationFrame(() => {
@@ -83,41 +82,45 @@ export default function App() {
   const winner = winnerIndex != null ? segments[winnerIndex] : null;
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center px-5 py-10 text-center bg-gradient-to-b from-rose-50 via-sky-50 to-violet-50">
-      <div className="w-full max-w-3xl">
-        {/* 🩷 Header */}
-        <div className="mx-auto mb-8">
+    <div className="min-h-screen w-full flex items-center justify-center px-5 py-8 sm:py-10 text-center bg-gradient-to-b from-rose-50 via-sky-50 to-violet-50">
+      <div className="w-full max-w-3xl flex flex-col items-center">
+        {/* Header */}
+        <div className="mb-8">
           <h1
-            className="text-5xl sm:text-5xl font-extrabold tracking-tight 
+            className="text-3xl sm:text-4xl font-extrabold tracking-tight 
                        bg-gradient-to-r from-violet-300 via-indigo-300 to-sky-300
                        bg-clip-text text-transparent 
                        drop-shadow-[0_2px_4px_rgba(0,0,0,0.08)]
                        font-['Poppins',sans-serif]"
           >
-            Spin The Wheel
+            Spin the Wheel
           </h1>
-          <p className="text-zinc-600 mt-4 text-base sm:text-lg font-medium">
+          <p className="text-zinc-600 mt-2 text-sm sm:text-base font-medium max-w-md mx-auto">
             Lägg till egna val och låt ödet (ibland) bestämma ✨
           </p>
 
-          <button
-            onClick={() => setManageOpen(true)}
-            className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-white/80 border border-white/70 shadow-sm
-                       px-5 py-3 font-bold text-zinc-800 hover:bg-white transition
-                       focus:outline-none focus:ring-4 focus:ring-pink-200"
-          >
-            <span>➕</span> Lägg till val
-          </button>
+          <div className="mt-3 flex items-center justify-center gap-2 flex-wrap">
+            <button
+              onClick={() => setManageOpen(true)}
+              className="inline-flex items-center gap-2 rounded-2xl bg-white/80 border border-white/70 shadow-sm
+                         px-5 py-2 font-bold text-zinc-800 hover:bg-white transition
+                         focus:outline-none focus:ring-4 focus:ring-indigo-200"
+            >
+              <span>➕</span> Lägg till val
+            </button>
+          </div>
         </div>
 
-        {/* 🎡 Wheel */}
-        <div className="mx-auto rounded-3xl bg-white/70 backdrop-blur-sm border border-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] p-6">
-          <Wheel
-            segments={segments}
-            rotation={rotation}
-            spinning={spinning}
-            onTransitionEnd={onTransitionEnd}
-          />
+        {/* Kort med hjulet */}
+        <div className="w-full rounded-3xl bg-white/70 backdrop-blur-sm border border-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] p-6 flex flex-col items-center justify-center">
+          <div className="w-full flex justify-center items-center">
+            <Wheel
+              segments={segments}
+              rotation={rotation}
+              spinning={spinning}
+              onTransitionEnd={onTransitionEnd}
+            />
+          </div>
 
           {/* Snurra-knapp */}
           <div className="mt-6">
@@ -126,9 +129,9 @@ export default function App() {
               onClick={spin}
               className="group relative inline-flex items-center justify-center rounded-full
                          h-16 w-32 sm:h-20 sm:w-40
-                         bg-gradient-to-r from-pink-200 via-fuchsia-200 to-violet-200
+                         bg-gradient-to-r from-violet-200 via-indigo-200 to-sky-200
                          text-zinc-900 font-extrabold text-lg sm:text-xl
-                         shadow-[0_8px_24px_rgba(244,114,182,0.35)] disabled:opacity-50
+                         shadow-[0_8px_24px_rgba(147,197,253,0.35)] disabled:opacity-50
                          transition-transform active:scale-95 hover:scale-[1.06]"
               aria-label="Snurra"
               title="Snurra"
