@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+/* Egna utilities för safe areas på mobil */
+@layer utilities {
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+  .pt-safe { padding-top: env(safe-area-inset-top); }
+}

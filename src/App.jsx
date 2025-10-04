@@ -19,7 +19,6 @@ export default function App() {
   const [winnerIndex, setWinnerIndex] = useState(null);
   const liveRef = useRef(null);
 
-  // färglägg + struktur
   const segments = useMemo(() => items.map((label, i) => ({
     label,
     color: PALETTE[i % PALETTE.length],
@@ -48,10 +47,11 @@ export default function App() {
     const winner = pickRandomIndex(n);
 
     const segSize = 360 / n;
-    const center = winner * segSize + segSize / 2; // vinnande segments mitt
-    const extraTurns = 5 + Math.floor(Math.random() * 4); // 5..8
-    const target = extraTurns * 360 + (360 - center); // placera vinnaren uppe vid indikatorn
+    const center = winner * segSize + segSize / 2; // mitt på vinnande segmentet
+    const extraTurns = 5 + Math.floor(Math.random() * 4); // 5..8 varv
+    const target = extraTurns * 360 + (360 - center); // landa vid indikatorn
 
+    // reset → target (för att kunna snurra flera gånger)
     requestAnimationFrame(() => {
       setRotation(prev => prev % 360);
       requestAnimationFrame(() => {
@@ -75,7 +75,7 @@ export default function App() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6 font-[system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif]">
+    <div className="max-w-5xl mx-auto p-4 sm:p-6 pt-safe pb-24">
       <h1 className="text-2xl sm:text-3xl font-extrabold">Spin the Wheel</h1>
       <p className="text-zinc-600 mt-1">Lägg till egna val och låt ödet (ibland) bestämma ✨</p>
 
@@ -88,9 +88,7 @@ export default function App() {
             onTransitionEnd={onTransitionEnd}
           />
           <div role="status" aria-live="polite" ref={liveRef} className="h-6 mt-2 text-center font-bold" />
-          <div className="mt-3">
-            <div className="text-sm text-zinc-600">{segments.length} val</div>
-          </div>
+          <div className="mt-3 text-sm text-zinc-600">{segments.length} val</div>
         </div>
 
         <div className="bg-white/70 backdrop-blur border border-zinc-200 rounded-2xl p-4">
@@ -102,6 +100,28 @@ export default function App() {
             onAdd={onAdd}
           />
           <SegmentList segments={segments} onRemove={onRemove} />
+        </div>
+      </div>
+
+      {/* Mobil action bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50
+                      bg-white/90 backdrop-blur border-t border-zinc-200
+                      px-4 pt-3 pb-4 pb-safe">
+        <div className="flex gap-2">
+          <button
+            disabled={!canSpin}
+            onClick={spin}
+            className="flex-1 px-5 py-3 rounded-2xl bg-zinc-900 text-white font-bold disabled:opacity-50"
+          >
+            Snurra
+          </button>
+          <button
+            disabled={spinning}
+            onClick={resetWheel}
+            className="px-4 py-3 rounded-2xl border border-zinc-300 font-bold disabled:opacity-50"
+          >
+            Nollställ
+          </button>
         </div>
       </div>
 
