@@ -1,21 +1,11 @@
-// src/components/ManageChoicesModal.jsx
 import React, { useEffect, useRef } from "react";
 import Controls from "./Controls.jsx";
 import SegmentList from "./SegmentList.jsx";
 
-/**
- * Modal som visar samma innehåll som din nuvarande "ruta för val":
- * - Controls (input + Lägg till)
- * - SegmentList (lista + Ta bort)
- */
 export default function ManageChoicesModal({
   open,
   onClose,
   segments,
-  canSpin,
-  spinning,
-  onSpin,
-  onReset,
   onAdd,
   onRemove,
 }) {
@@ -23,7 +13,6 @@ export default function ManageChoicesModal({
 
   useEffect(() => {
     if (!open) return;
-    // Enkel fokus-hjälp: fokusera dialogen
     const id = setTimeout(() => dialogRef.current?.focus(), 0);
     return () => clearTimeout(id);
   }, [open]);
@@ -37,40 +26,34 @@ export default function ManageChoicesModal({
       aria-modal="true"
       aria-labelledby="manage-choices-title"
       onClick={(e) => {
-        // Klick på backdrop stänger
         if (e.target === e.currentTarget) onClose();
       }}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
 
       {/* Dialog */}
       <div
         ref={dialogRef}
         tabIndex={-1}
-        className="relative z-10 w-[92vw] max-w-lg rounded-2xl bg-white border border-zinc-200 shadow-xl p-4"
+        className="relative z-10 w-[92vw] max-w-lg rounded-3xl bg-white/80 backdrop-blur border border-white/70
+                   shadow-[0_20px_60px_-10px_rgba(0,0,0,0.25)] p-5"
       >
         <div className="flex items-center justify-between gap-3">
-          <h2 id="manage-choices-title" className="text-lg font-bold">
-            Hantera val
-          </h2>
           <button
             onClick={onClose}
-            className="px-3 py-1.5 rounded-xl border border-zinc-300 hover:bg-zinc-50"
+            className="px-3 py-1.5 rounded-xl border border-zinc-200 bg-white/70 hover:bg-white font-semibold"
           >
             Stäng
           </button>
         </div>
 
-        {/* Samma innehåll som tidigare sidopanel */}
-        <div className="mt-3">
-          <Controls
-            canSpin={canSpin}
-            spinning={spinning}
-            onSpin={onSpin}
-            onReset={onReset}
-            onAdd={onAdd}
-          />
+        <p className="text-sb text-zinc-600 mt-1">
+          Lägg till eller ta bort i listan
+        </p>
+
+        <div className="mt-4">
+          <Controls onAdd={onAdd} />
           <SegmentList segments={segments} onRemove={onRemove} />
         </div>
       </div>
