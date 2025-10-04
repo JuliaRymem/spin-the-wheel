@@ -54,7 +54,7 @@ export default function ManageChoicesModal({
         </div>
 
         <p className="text-sm text-zinc-600 mt-1">
-          Här kan du lägga till val för hjulet. <br /> Vill du skriva flera val samtidigt? använd ett <br /> <span className="font-semibold">kommatecken</span> eller <span className="font-semibold">radbrytning</span>.
+          Här kan du lägga till val för hjulet. <br /> <br /> Vill du skriva flera val samtidigt? <br /> använd ett <span className="font-semibold">kommatecken</span> eller <span className="font-semibold">radbrytning</span>.
         </p>
 
         {/* Större, enklare skriv-ruta */}
