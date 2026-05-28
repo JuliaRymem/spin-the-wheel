@@ -82,13 +82,13 @@ export default function Wheel({ segments, rotation, spinning, onTransitionEnd })
         </div>
       </div>
 
-      {/* Pilen (nu åt rätt håll — pekar NER mot hjulet) */}
+      {/* Pil som pekar ner mot hjulet */}
       <div
         aria-hidden
-        className="absolute left-1/2 -top-2 -translate-x-1/2 w-0 h-0
-                   border-l-[10px] border-l-transparent
-                   border-r-[10px] border-r-transparent
-                   border-t-[16px] border-t-rose-300 drop-shadow"
+        className="absolute left-1/2 -top-2 -translate-x-1/2 z-10 w-0 h-0
+                   border-l-[13px] border-l-transparent
+                   border-r-[13px] border-r-transparent
+                   border-t-[22px] border-t-rose-400 drop-shadow-md"
       />
     </div>
   );

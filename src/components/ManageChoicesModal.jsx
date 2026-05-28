@@ -8,6 +8,7 @@ export default function ManageChoicesModal({
   segments,
   onAdd,
   onRemove,
+  onEdit,
 }) {
   const dialogRef = useRef(null);
 
@@ -43,7 +44,7 @@ export default function ManageChoicesModal({
       >
         <div className="flex items-center justify-between gap-3">
           <h2 id="manage-choices-title" className="text-lg font-extrabold text-zinc-800">
-            
+            Hantera val
           </h2>
           <button
             onClick={() => onClose?.()}
@@ -57,19 +58,16 @@ export default function ManageChoicesModal({
           Här kan du lägga till val för hjulet. <br /> <br /> Vill du skriva flera val samtidigt? <br /> använd ett <span className="font-semibold">kommatecken</span> eller <span className="font-semibold">radbrytning</span>.
         </p>
 
-        {/* Större, enklare skriv-ruta */}
         <div className="mt-4">
           <Controls
-            variant="modal"                // större styling
-            onAdd={onAdd}                  // anropas per nytt värde
-            existingLabels={existingLabels} // dedupe (case-insensitive)
+            variant="modal"
+            onAdd={onAdd}
+            existingLabels={existingLabels}
           />
         </div>
 
-        {/* Större lista */}
-        <SegmentList size="lg" segments={segments} onRemove={onRemove} />
+        <SegmentList size="lg" segments={segments} onRemove={onRemove} onEdit={onEdit} />
 
-        {/* Knapp under listan: stäng och tillbaka till hjulet */}
         <div className="mt-5 flex justify-center">
           <button
             onClick={() => onClose?.()}

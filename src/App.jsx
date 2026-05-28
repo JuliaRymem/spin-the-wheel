@@ -5,7 +5,6 @@ import WinnerPanel from "./components/WinnerPanel.jsx";
 import { useLocalStorage } from "./hooks/useLocalStorage.js";
 import { pickRandomIndex } from "./utils/random.js";
 
-// Pastellfärger till hjulet
 const PALETTE = [
   "#FBCFE8", "#BFDBFE", "#A7F3D0", "#FDE68A", "#C7D2FE",
   "#FECACA", "#BAE6FD", "#F5D0FE", "#FDE1D3", "#D9F99D",
@@ -15,6 +14,7 @@ export default function App() {
   const [items, setItems] = useLocalStorage("wheel.items.v1", [
     "Pizza", "Burgare", "Sallad", "Sushi", "Tacos", "Pasta",
   ]);
+  const [history, setHistory] = useLocalStorage("wheel.history.v1", []);
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const [winnerIndex, setWinnerIndex] = useState(null);
@@ -23,11 +23,7 @@ export default function App() {
   const liveRef = useRef(null);
 
   const segments = useMemo(
-    () =>
-      items.map((label, i) => ({
-        label,
-        color: PALETTE[i % PALETTE.length],
-      })),
+    () => items.map((label, i) => ({ label, color: PALETTE[i % PALETTE.length] })),
     [items]
   );
 
@@ -46,35 +42,45 @@ export default function App() {
     if (winnerIndex === idx) setWinnerIndex(null);
   }
 
+  function onEdit(idx, newLabel) {
+    const v = (newLabel || "").trim();
+    if (!v) return;
+    if (items.some((s, i) => i !== idx && s.toLowerCase() === v.toLowerCase())) return;
+    setItems((prev) => prev.map((s, i) => (i === idx ? v : s)));
+  }
+
   function spin() {
     if (!canSpin) return;
-    setSpinning(true);
-    setWinnerIndex(null);
-    setWinOpen(false);
 
     const n = segments.length;
     const winner = pickRandomIndex(n);
     const segSize = 360 / n;
-
     const center = (winner + 0.5) * segSize;
     const centerFromTop = -90 + center;
     const normalized = ((centerFromTop % 360) + 360) % 360;
     const extraTurns = 5 + Math.floor(Math.random() * 4);
-    const target = extraTurns * 360 + (360 - normalized);
 
+    setWinnerIndex(winner);
+    setWinOpen(false);
+
+    // Single rAF ensures the browser has painted the current frame (spinning=false,
+    // transition:none) before we enable the transition and set the new rotation.
     requestAnimationFrame(() => {
-      setRotation((prev) => prev % 360);
-      requestAnimationFrame(() => {
-        setRotation(target);
-        setWinnerIndex(winner);
+      setSpinning(true);
+      setRotation((prev) => {
+        const currentNorm = ((prev % 360) + 360) % 360;
+        const delta = ((360 - normalized - currentNorm) + 360) % 360;
+        return prev + extraTurns * 360 + delta;
       });
     });
   }
 
   function onTransitionEnd() {
     setSpinning(false);
-    if (winnerIndex != null && liveRef.current) {
-      liveRef.current.textContent = `Vinnare: ${segments[winnerIndex].label}`;
+    if (winnerIndex != null) {
+      const seg = segments[winnerIndex];
+      if (liveRef.current) liveRef.current.textContent = `Vinnare: ${seg.label}`;
+      setHistory((prev) => [{ label: seg.label, color: seg.color }, ...prev].slice(0, 20));
       setWinOpen(true);
     }
   }
@@ -87,11 +93,10 @@ export default function App() {
         {/* Header */}
         <div className="mb-8">
           <h1
-            className="text-3xl sm:text-4xl font-extrabold tracking-tight 
+            className="text-3xl sm:text-4xl font-extrabold tracking-tight
                        bg-gradient-to-r from-violet-300 via-indigo-300 to-sky-300
-                       bg-clip-text text-transparent 
-                       drop-shadow-[0_2px_4px_rgba(0,0,0,0.08)]
-                       font-['Poppins',sans-serif]"
+                       bg-clip-text text-transparent
+                       drop-shadow-[0_2px_4px_rgba(0,0,0,0.08)]"
           >
             Spin the Wheel
           </h1>
@@ -151,6 +156,26 @@ export default function App() {
             className="h-6 mt-4 font-bold text-zinc-700"
           />
           <div className="mt-1 text-sm text-zinc-500">{segments.length} val</div>
+
+          {/* Historik */}
+          {history.length > 0 && (
+            <div className="mt-5 w-full">
+              <p className="text-xs text-zinc-400 font-semibold uppercase tracking-wide mb-2">
+                Historik
+              </p>
+              <div className="flex gap-2 flex-wrap justify-center">
+                {history.slice(0, 10).map((h, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1 rounded-full text-sm font-semibold text-zinc-800 border border-white/80 shadow-sm"
+                    style={{ background: `${h.color}CC` }}
+                  >
+                    {h.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -161,6 +186,7 @@ export default function App() {
         segments={segments}
         onAdd={onAdd}
         onRemove={onRemove}
+        onEdit={onEdit}
       />
 
       {/* Popup: Vinstpanel */}
